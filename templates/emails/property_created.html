@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Imóvel Cadastrado - QuotasBNB{% endblock %}
+
+{% block content %}
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h1 style="color: #0d6efd;">QuotasBNB</h1>
+        <p style="color: #666;">A plataforma de aluguel de imóveis entre pessoas</p>
+    </div>
+    
+    <div style="margin-bottom: 30px;">
+        <h2 style="color: #333;">Imóvel Cadastrado com Sucesso!</h2>
+        <p>Olá {{ user.first_name|default:user.username }},</p>
+        <p>Seu imóvel foi cadastrado com sucesso em nossa plataforma. Abaixo estão os detalhes:</p>
+    </div>
+    
+    <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <h3 style="color: #0d6efd; margin-top: 0;">{{ property.title }}</h3>
+        <p><strong>Endereço:</strong> {{ property.address }}, {{ property.city }}/{{ property.state }}</p>
+        <p><strong>Preço:</strong> R$ {{ property.price }}</p>
+        <p><strong>Data de cadastro:</strong> {{ property.created_at|date:"d/m/Y H:i" }}</p>
+    </div>
+    
+    <div style="margin-bottom: 30px;">
+        <p>Seu imóvel já está disponível para visualização e reservas. Você pode gerenciar seu imóvel e ver as reservas através do seu painel de controle.</p>
+        <p>Para acessar seu painel, <a href="{{ site_url }}{% url 'dashboard' %}" style="color: #0d6efd; text-decoration: none;">clique aqui</a>.</p>
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+        <p style="color: #666; font-size: 14px;">© {% now "Y" %} QuotasBNB. Todos os direitos reservados.</p>
+        <p style="color: #666; font-size: 14px;">Este e-mail foi enviado para {{ user.email }}</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Fazer Reserva - QuotasBNB{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Fazer Reserva</h3>
+                </div>
+                <div class="card-body">
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Detalhes do Imóvel</h5>
+                        </div>
+                        <div class="card-body">
+                            <h4>{{ property.title }}</h4>
+                            <p class="text-muted">
+                                <i class="fas fa-map-marker-alt"></i> {{ property.address }}, {{ property.city }}/{{ property.state }}
+                            </p>
+                            
+                            {% if property.main_photo %}
+                            <div class="text-center mb-3">
+                                <img src="{{ property.main_photo.image.url }}" class="img-fluid rounded" style="max-height: 200px;" alt="{{ property.title }}">
+                            </div>
+                            {% endif %}
+                            
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">Período Selecionado</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Data de Início:</strong> {{ period.start_date|date:"d/m/Y" }}</p>
+                                    <p><strong>Data de Término:</strong> {{ period.end_date|date:"d/m/Y" }}</p>
+                                    <p><strong>Preço:</strong> R$ {{ property.price }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <p><i class="fas fa-info-circle"></i> <strong>Informações importantes:</strong></p>
+                        <ul>
+                            <li>Ao confirmar a reserva, o período selecionado ficará indisponível para outros usuários.</li>
+                            <li>Você receberá um e-mail de confirmação com os detalhes da reserva.</li>
+                            <li>O proprietário do imóvel será notificado sobre sua reserva.</li>
+                        </ul>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-calendar-check"></i> Confirmar Reserva
+                            </button>
+                            <a href="{% url 'property_detail' property.slug %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

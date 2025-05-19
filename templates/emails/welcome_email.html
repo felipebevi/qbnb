@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bem-vindo ao QuotasBNB{% endblock %}
+
+{% block content %}
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h1 style="color: #0d6efd;">QuotasBNB</h1>
+        <p style="color: #666;">A plataforma de aluguel de imóveis entre pessoas</p>
+    </div>
+    
+    <div style="margin-bottom: 30px;">
+        <h2 style="color: #333;">Bem-vindo ao QuotasBNB!</h2>
+        <p>Olá {{ user.first_name|default:user.username }},</p>
+        <p>Obrigado por se cadastrar em nossa plataforma. Estamos muito felizes em tê-lo conosco!</p>
+    </div>
+    
+    <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <h3 style="color: #0d6efd; margin-top: 0;">O que você pode fazer agora:</h3>
+        <ul style="padding-left: 20px;">
+            <li>Completar seu perfil com mais informações</li>
+            <li>Buscar imóveis disponíveis para aluguel</li>
+            <li>Cadastrar seu próprio imóvel para aluguel</li>
+            <li>Explorar a plataforma e conhecer todas as funcionalidades</li>
+        </ul>
+    </div>
+    
+    <div style="margin-bottom: 30px;">
+        <p>Para acessar seu painel, <a href="{{ site_url }}{% url 'dashboard' %}" style="color: #0d6efd; text-decoration: none;">clique aqui</a>.</p>
+        <p>Se tiver qualquer dúvida, não hesite em entrar em contato conosco.</p>
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+        <p style="color: #666; font-size: 14px;">© {% now "Y" %} QuotasBNB. Todos os direitos reservados.</p>
+        <p style="color: #666; font-size: 14px;">Este e-mail foi enviado para {{ user.email }}</p>
+    </div>
+</div>
+{% endblock %}

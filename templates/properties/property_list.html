@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Imóveis - QuotasBNB{% endblock %}
+
+{% block extra_css %}
+<style>
+    .property-card {
+        transition: transform 0.3s;
+        height: 100%;
+    }
+    
+    .property-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .property-img {
+        height: 200px;
+        object-fit: cover;
+    }
+    
+    .search-box {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Imóveis Disponíveis</h1>
+    
+    <!-- Search Form -->
+    <div class="search-box">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="{{ form.location.id_for_label }}" class="form-label">{{ form.location.label }}</label>
+                {{ form.location }}
+            </div>
+            <div class="col-md-2">
+                <label for="{{ form.start_date.id_for_label }}" class="form-label">{{ form.start_date.label }}</label>
+                {{ form.start_date }}
+            </div>
+            <div class="col-md-2">
+                <label for="{{ form.end_date.id_for_label }}" class="form-label">{{ form.end_date.label }}</label>
+                {{ form.end_date }}
+            </div>
+            <div class="col-md-2">
+                <label for="{{ form.min_price.id_for_label }}" class="form-label">{{ form.min_price.label }}</label>
+                {{ form.min_price }}
+            </div>
+            <div class="col-md-2">
+                <label for="{{ form.max_price.id_for_label }}" class="form-label">{{ form.max_price.label }}</label>
+                {{ form.max_price }}
+            </div>
+            <div class="col-12 text-center mt-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+                <a href="{% url 'property_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-redo"></i> Limpar Filtros
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Properties List -->
+    {% if properties %}
+    <div class="row">
+        {% for property in properties %}
+        <div class="col-md-4 mb-4">
+            <div class="card property-card">
+                {% if property.main_photo %}
+                <img src="{{ property.main_photo.image.url }}" class="card-img-top property-img" alt="{{ property.title }}">
+                {% else %}
+                <div class="card-img-top property-img bg-light d-flex align-items-center justify-content-center">
+                    <i class="fas fa-home fa-3x text-secondary"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ property.title }}</h5>
+                    <p class="card-text text-muted">
+                        <i class="fas fa-map-marker-alt"></i> {{ property.city }}, {{ property.state }}
+                    </p>
+                    <p class="card-text">
+                        <strong>R$ {{ property.price }}</strong> / diária
+                    </p>
+                    <p class="card-text small">
+                        {% with periods=property.available_periods.count %}
+                            {% if periods > 0 %}
+                                <span class="text-success">
+                                    <i class="fas fa-calendar-check"></i> {{ periods }} período{{ periods|pluralize }} disponíve{{ periods|pluralize:"l,is" }}
+                                </span>
+                            {% else %}
+                                <span class="text-danger">
+                                    <i class="fas fa-calendar-times"></i> Sem períodos disponíveis
+                                </span>
+                            {% endif %}
+                        {% endwith %}
+                    </p>
+                </div>
+                <div class="card-footer bg-white">
+                    <a href="{% url 'property_detail' property.slug %}" class="btn btn-primary w-100">Ver Detalhes</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if properties.has_other_pages %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if properties.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ properties.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for i in properties.paginator.page_range %}
+                {% if properties.number == i %}
+                <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if properties.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ properties.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+    {% else %}
+    <div class="alert alert-info">
+        <p>Nenhum imóvel encontrado com os critérios de busca.</p>
+        <a href="{% url 'property_list' %}" class="btn btn-primary">Ver todos os imóveis</a>
+    </div>
+    {% endif %}
+    
+    {% if user.is_authenticated and user.profile.is_advertiser %}
+    <div class="text-center mt-4">
+        <a href="{% url 'property_create' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Cadastrar Novo Imóvel
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

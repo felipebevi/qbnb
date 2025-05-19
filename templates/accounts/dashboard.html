@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Meu Painel - QuotasBNB{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Meu Painel</h1>
+    
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Menu</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#meus-imoveis" class="list-group-item list-group-item-action" data-bs-toggle="tab">Meus Imóveis</a>
+                    <a href="#minhas-reservas" class="list-group-item list-group-item-action" data-bs-toggle="tab">Minhas Reservas</a>
+                    <a href="#reservas-recebidas" class="list-group-item list-group-item-action" data-bs-toggle="tab">Reservas Recebidas</a>
+                    <a href="{% url 'profile' %}" class="list-group-item list-group-item-action">Meu Perfil</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="tab-content">
+                <!-- Meus Imóveis -->
+                <div class="tab-pane fade show active" id="meus-imoveis">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Meus Imóveis</h5>
+                            {% if user.profile.is_advertiser %}
+                            <a href="{% url 'property_create' %}" class="btn btn-light btn-sm">
+                                <i class="fas fa-plus"></i> Novo Imóvel
+                            </a>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            {% if user.properties.all %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Título</th>
+                                                <th>Localização</th>
+                                                <th>Preço</th>
+                                                <th>Períodos</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for property in user.properties.all %}
+                                            <tr>
+                                                <td>{{ property.title }}</td>
+                                                <td>{{ property.city }}, {{ property.state }}</td>
+                                                <td>R$ {{ property.price }}</td>
+                                                <td>{{ property.periods.count }}</td>
+                                                <td>
+                                                    <a href="{% url 'property_detail' property.slug %}" class="btn btn-sm btn-info">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="{% url 'property_update' property.slug %}" class="btn btn-sm btn-warning">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="{% url 'property_delete' property.slug %}" class="btn btn-sm btn-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    {% if user.profile.is_advertiser %}
+                                        <p>Você ainda não cadastrou nenhum imóvel.</p>
+                                        <a href="{% url 'property_create' %}" class="btn btn-primary">Cadastrar Imóvel</a>
+                                    {% else %}
+                                        <p>Você não é um anunciante. Para cadastrar imóveis, atualize seu perfil.</p>
+                                        <a href="{% url 'profile' %}" class="btn btn-primary">Atualizar Perfil</a>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Minhas Reservas -->
+                <div class="tab-pane fade" id="minhas-reservas">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Minhas Reservas</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if user.reservations.all %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Imóvel</th>
+                                                <th>Período</th>
+                                                <th>Status</th>
+                                                <th>Data da Reserva</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for reservation in user.reservations.all %}
+                                            <tr>
+                                                <td>{{ reservation.period.property.title }}</td>
+                                                <td>{{ reservation.period.start_date|date:"d/m/Y" }} a {{ reservation.period.end_date|date:"d/m/Y" }}</td>
+                                                <td>
+                                                    {% if reservation.confirmed %}
+                                                        <span class="badge bg-success">Confirmada</span>
+                                                    {% else %}
+                                                        <span class="badge bg-warning">Pendente</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ reservation.created_at|date:"d/m/Y" }}</td>
+                                                <td>
+                                                    <a href="{% url 'reservation_detail' reservation.id %}" class="btn btn-sm btn-info">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="{% url 'reservation_cancel' reservation.id %}" class="btn btn-sm btn-danger">
+                                                        <i class="fas fa-times"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <p>Você ainda não fez nenhuma reserva.</p>
+                                    <a href="{% url 'property_list' %}" class="btn btn-primary">Buscar Imóveis</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reservas Recebidas -->
+                <div class="tab-pane fade" id="reservas-recebidas">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Reservas Recebidas</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if advertiser_reservations %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Imóvel</th>
+                                                <th>Cliente</th>
+                                                <th>Período</th>
+                                                <th>Status</th>
+                                                <th>Data da Reserva</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for reservation in advertiser_reservations %}
+                                            <tr>
+                                                <td>{{ reservation.period.property.title }}</td>
+                                                <td>{{ reservation.user.email }}</td>
+                                                <td>{{ reservation.period.start_date|date:"d/m/Y" }} a {{ reservation.period.end_date|date:"d/m/Y" }}</td>
+                                                <td>
+                                                    {% if reservation.confirmed %}
+                                                        <span class="badge bg-success">Confirmada</span>
+                                                    {% else %}
+                                                        <span class="badge bg-warning">Pendente</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ reservation.created_at|date:"d/m/Y" }}</td>
+                                                <td>
+                                                    <a href="{% url 'reservation_detail' reservation.id %}" class="btn btn-sm btn-info">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <p>Você ainda não recebeu nenhuma reserva para seus imóveis.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ativar tabs do Bootstrap
+        var triggerTabList = [].slice.call(document.querySelectorAll('a[data-bs-toggle="tab"]'))
+        triggerTabList.forEach(function (triggerEl) {
+            var tabTrigger = new bootstrap.Tab(triggerEl)
+            triggerEl.addEventListener('click', function (event) {
+                event.preventDefault()
+                tabTrigger.show()
+            })
+        })
+    });
+</script>
+{% endblock %}

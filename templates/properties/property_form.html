@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if property %}Editar{% else %}Cadastrar{% endif %} Imóvel - QuotasBNB{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .photo-preview {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .formset-item {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">{% if property %}Editar{% else %}Cadastrar{% endif %} Imóvel</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Informações Básicas -->
+                        <div class="form-section">
+                            <h4 class="mb-3">Informações Básicas</h4>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.title.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.description.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.price.id_for_label }}" class="form-label">{{ form.price.label }} (R$)</label>
+                                {{ form.price }}
+                                {% if form.price.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.price.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Localização -->
+                        <div class="form-section">
+                            <h4 class="mb-3">Localização</h4>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.address.id_for_label }}" class="form-label">{{ form.address.label }}</label>
+                                {{ form.address }}
+                                {% if form.address.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.address.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.city.id_for_label }}" class="form-label">{{ form.city.label }}</label>
+                                    {{ form.city }}
+                                    {% if form.city.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.city.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.state.id_for_label }}" class="form-label">{{ form.state.label }}</label>
+                                    {{ form.state }}
+                                    {% if form.state.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.state.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.zip_code.id_for_label }}" class="form-label">{{ form.zip_code.label }}</label>
+                                    {{ form.zip_code }}
+                                    {% if form.zip_code.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.zip_code.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fotos -->
+                        <div class="form-section">
+                            <h4 class="mb-3">Fotos (máximo 10)</h4>
+                            
+                            {{ photo_formset.management_form }}
+                            
+                            <div id="photo-formset">
+                                {% for photo_form in photo_formset %}
+                                <div class="formset-item photo-form">
+                                    {% if photo_form.instance.pk %}
+                                    <div class="text-center mb-3">
+                                        <img src="{{ photo_form.instance.image.url }}" class="photo-preview" alt="Foto do imóvel">
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {{ photo_form.id }}
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ photo_form.image.id_for_label }}" class="form-label">Imagem</label>
+                                        {{ photo_form.image }}
+                                        {% if photo_form.image.errors %}
+                                        <div class="text-danger">
+                                            {% for error in photo_form.image.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ photo_form.caption.id_for_label }}" class="form-label">Legenda</label>
+                                        {{ photo_form.caption }}
+                                        {% if photo_form.caption.errors %}
+                                        <div class="text-danger">
+                                            {% for error in photo_form.caption.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mb-3 form-check">
+                                        {{ photo_form.is_main }}
+                                        <label class="form-check-label" for="{{ photo_form.is_main.id_for_label }}">
+                                            Foto principal
+                                        </label>
+                                    </div>
+                                    
+                                    {% if photo_formset.can_delete %}
+                                    <div class="mb-3 form-check">
+                                        {{ photo_form.DELETE }}
+                                        <label class="form-check-label" for="{{ photo_form.DELETE.id_for_label }}">
+                                            Excluir esta foto
+                                        </label>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <button type="button" id="add-photo" class="btn btn-outline-primary">
+                                <i class="fas fa-plus"></i> Adicionar Foto
+                            </button>
+                        </div>
+                        
+                        <!-- Períodos -->
+                        <div class="form-section">
+                            <h4 class="mb-3">Períodos Disponíveis (máximo 3)</h4>
+                            
+                            {{ period_formset.management_form }}
+                            
+                            <div id="period-formset">
+                                {% for period_form in period_formset %}
+                                <div class="formset-item period-form">
+                                    {{ period_form.id }}
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ period_form.start_date.id_for_label }}" class="form-label">Data de Início</label>
+                                            {{ period_form.start_date }}
+                                            {% if period_form.start_date.errors %}
+                                            <div class="text-danger">
+                                                {% for error in period_form.start_date.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ period_form.end_date.id_for_label }}" class="form-label">Data de Término</label>
+                                            {{ period_form.end_date }}
+                                            {% if period_form.end_date.errors %}
+                                            <div class="text-danger">
+                                                {% for error in period_form.end_date.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    {% if period_formset.can_delete %}
+                                    <div class="mb-3 form-check">
+                                        {{ period_form.DELETE }}
+                                        <label class="form-check-label" for="{{ period_form.DELETE.id_for_label }}">
+                                            Excluir este período
+                                        </label>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <button type="button" id="add-period" class="btn btn-outline-primary">
+                                <i class="fas fa-plus"></i> Adicionar Período
+                            </button>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {% if property %}Atualizar{% else %}Cadastrar{% endif %} Imóvel
+                            </button>
+                            <a href="{% if property %}{% url 'property_detail' property.slug %}{% else %}{% url 'property_list' %}{% endif %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar formsets
+        const photoFormset = document.getElementById('photo-formset');
+        const periodFormset = document.getElementById('period-formset');
+        const addPhotoBtn = document.getElementById('add-photo');
+        const addPeriodBtn = document.getElementById('add-period');
+        
+        // Adicionar nova foto
+        if (addPhotoBtn) {
+            addPhotoBtn.addEventListener('click', function() {
+                const forms = photoFormset.getElementsByClassName('photo-form');
+                const formCount = forms.length;
+                const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+                
+                if (formCount < 10) {  // Máximo de 10 fotos
+                    const newForm = forms[0].cloneNode(true);
+                    
+                    // Limpar valores e atualizar IDs
+                    const inputs = newForm.getElementsByTagName('input');
+                    for (let i = 0; i < inputs.length; i++) {
+                        const input = inputs[i];
+                        input.value = '';
+                        input.checked = false;
+                        input.id = input.id.replace('-0-', '-' + formCount + '-');
+                        input.name = input.name.replace('-0-', '-' + formCount + '-');
+                    }
+                    
+                    // Remover preview de imagem se existir
+                    const imgPreview = newForm.querySelector('.photo-preview');
+                    if (imgPreview) {
+                        imgPreview.parentNode.removeChild(imgPreview);
+                    }
+                    
+                    // Atualizar labels
+                    const labels = newForm.getElementsByTagName('label');
+                    for (let i = 0; i < labels.length; i++) {
+                        const label = labels[i];
+                        label.htmlFor = label.htmlFor.replace('-0-', '-' + formCount + '-');
+                    }
+                    
+                    photoFormset.appendChild(newForm);
+                    totalForms.value = formCount + 1;
+                } else {
+                    alert('Você atingiu o limite máximo de 10 fotos.');
+                }
+            });
+        }
+        
+        // Adicionar novo período
+        if (addPeriodBtn) {
+            addPeriodBtn.addEventListener('click', function() {
+                const forms = periodFormset.getElementsByClassName('period-form');
+                const formCount = forms.length;
+                const totalForms = document.getElementById('id_period-TOTAL_FORMS');
+                
+                if (formCount < 3) {  // Máximo de 3 períodos
+                    const newForm = forms[0].cloneNode(true);
+                    
+                    // Limpar valores e atualizar IDs
+                    const inputs = newForm.getElementsByTagName('input');
+                    for (let i = 0; i < inputs.length; i++) {
+                        const input = inputs[i];
+                        input.value = '';
+                        input.checked = false;
+                        input.id = input.id.replace('-0-', '-' + formCount + '-');
+                        input.name = input.name.replace('-0-', '-' + formCount + '-');
+                    }
+                    
+                    // Atualizar labels
+                    const labels = newForm.getElementsByTagName('label');
+                    for (let i = 0; i < labels.length; i++) {
+                        const label = labels[i];
+                        label.htmlFor = label.htmlFor.replace('-0-', '-' + formCount + '-');
+                    }
+                    
+                    periodFormset.appendChild(newForm);
+                    totalForms.value = formCount + 1;
+                } else {
+                    alert('Você atingiu o limite máximo de 3 períodos.');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
